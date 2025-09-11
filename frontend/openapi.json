@@ -1,0 +1,627 @@
+    {
+  "openapi": "3.0.1",
+  "info": { "title": "OpenAPI definition", "version": "v0" },
+  "servers": [{ "url": "http://localhost:8080", "description": "Local server" }],
+  "security": [{ "bearerAuth": [] }],
+  "tags": [
+    { "name": "Product API", "description": "Endpoints for managing products" },
+    {
+      "name": "Shopping Cart API",
+      "description": "Endpoints for managing the shopping cart"
+    },
+    {
+      "name": "Category API",
+      "description": "Endpoints for managing product categories"
+    },
+    {
+      "name": "User API",
+      "description": "Endpoints for user authentication and registration"
+    }
+  ],
+  "paths": {
+    "/api/products/edit/{id}": {
+      "put": {
+        "tags": ["Product API"],
+        "summary": "Update an existing product",
+        "description": "Updates a product by ID using ProductDto.",
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateProductDto" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/DisplayProductDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/categories/edit/{id}": {
+      "put": {
+        "tags": ["Category API"],
+        "summary": "Update an existing categoryId",
+        "description": "Updates a categoryId by ID.",
+        "operationId": "update_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateCategoryDto" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/DisplayCategoryDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/register": {
+      "post": {
+        "tags": ["User API"],
+        "summary": "Register a new user",
+        "description": "Creates a new user account",
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateUserDto" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/DisplayUserDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/login": {
+      "post": {
+        "tags": ["User API"],
+        "summary": "User login",
+        "description": "Authenticates a user and generates a JWT",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginUserDto" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/LoginResponseDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping-cart/remove-product/{id}": {
+      "post": {
+        "tags": ["Shopping Cart API"],
+        "summary": "Remove product from shopping cart",
+        "description": "Removes a product from the shopping cart for the logged-in user",
+        "operationId": "removeProductToShoppingCart",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/ShoppingCartDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shopping-cart/add-product/{id}": {
+      "post": {
+        "tags": ["Shopping Cart API"],
+        "summary": "Add product to shopping cart",
+        "description": "Adds a product to the shopping cart for the logged-in user",
+        "operationId": "addProductToShoppingCart",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/ShoppingCartDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/add": {
+      "post": {
+        "tags": ["Product API"],
+        "summary": "Add a new product",
+        "description": "Creates a new product based on the given ProductDto.",
+        "operationId": "save",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateProductDto" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/DisplayProductDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/categories/add": {
+      "post": {
+        "tags": ["Category API"],
+        "summary": "Add a new categoryId",
+        "description": "Creates a new categoryId.",
+        "operationId": "save_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateCategoryDto" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/DisplayCategoryDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/logout": {
+      "get": {
+        "tags": ["User API"],
+        "summary": "User logout",
+        "description": "Ends the user's session",
+        "operationId": "logout",
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/shopping-cart": {
+      "get": {
+        "tags": ["Shopping Cart API"],
+        "summary": "Get active shopping cart",
+        "description": "Retrieves the active shopping cart for the logged-in user",
+        "operationId": "getActiveShoppingCart",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/ShoppingCartDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products": {
+      "get": {
+        "tags": ["Product API"],
+        "summary": "Get all products",
+        "description": "Retrieves a list of all available products.",
+        "operationId": "findAll",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/DisplayProductDto" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/{id}": {
+      "get": {
+        "tags": ["Product API"],
+        "summary": "Get product by ID",
+        "description": "Finds a product by its ID.",
+        "operationId": "findById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/DisplayProductDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/recommended": {
+      "get": {
+        "tags": ["Product API"],
+        "summary": "Get recommended products",
+        "description": "Retrieves a list of recommended available products.",
+        "operationId": "findRecommended",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/DisplayProductDto" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/paginated": {
+      "get": {
+        "tags": ["Product API"],
+        "operationId": "findAll_1",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": { "$ref": "#/components/schemas/Pageable" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/PageDisplayProductDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/by-category/{id}": {
+      "get": {
+        "tags": ["Product API"],
+        "summary": "Get products by category",
+        "description": "Retrieves a list of  products by category.",
+        "operationId": "findProductsByCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": { "$ref": "#/components/schemas/Pageable" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/PageDisplayProductDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "tags": ["Category API"],
+        "summary": "Get all categories",
+        "description": "Retrieves a list of all available categories.",
+        "operationId": "findAll_2",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/DisplayCategoryDto" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/categories/{id}": {
+      "get": {
+        "tags": ["Category API"],
+        "summary": "Get categoryId by ID",
+        "description": "Finds a categoryId by its ID.",
+        "operationId": "findById_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "$ref": "#/components/schemas/DisplayCategoryDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/delete/{id}": {
+      "delete": {
+        "tags": ["Product API"],
+        "summary": "Delete a product",
+        "description": "Deletes a product by its ID.",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/categories/delete/{id}": {
+      "delete": {
+        "tags": ["Category API"],
+        "summary": "Delete a categoryId",
+        "description": "Deletes a categoryId by its ID.",
+        "operationId": "deleteById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateProductDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "price": { "type": "number", "format": "double" },
+          "image_url": { "type": "string" },
+          "characteristics": { "type": "array", "items": { "type": "string" } },
+          "category_id": { "type": "integer", "format": "int64" }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "name": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      },
+      "DisplayProductDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "name": { "type": "string" },
+          "price": { "type": "number", "format": "double" },
+          "image_url": { "type": "string" },
+          "characteristics": { "type": "array", "items": { "type": "string" } },
+          "category": { "$ref": "#/components/schemas/Category" }
+        }
+      },
+      "CreateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      },
+      "DisplayCategoryDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "name": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" },
+          "password": { "type": "string" },
+          "repeat_password": { "type": "string" },
+          "name": { "type": "string" },
+          "surname": { "type": "string" },
+          "role": { "type": "string", "enum": ["ROLE_USER", "ROLE_ADMIN"] }
+        }
+      },
+      "DisplayUserDto": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" },
+          "name": { "type": "string" },
+          "surname": { "type": "string" },
+          "role": { "type": "string", "enum": ["ROLE_USER", "ROLE_ADMIN"] }
+        }
+      },
+      "LoginUserDto": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" },
+          "password": { "type": "string" }
+        }
+      },
+      "LoginResponseDto": {
+        "type": "object",
+        "properties": { "token": { "type": "string" } }
+      },
+      "ShoppingCartDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "date_created": { "type": "string", "format": "date-time" },
+          "user": { "$ref": "#/components/schemas/DisplayUserDto" },
+          "products": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/DisplayProductDto" }
+          },
+          "status": {
+            "type": "string",
+            "enum": ["CREATED", "CANCELED", "FINISHED"]
+          }
+        }
+      },
+      "Pageable": {
+        "type": "object",
+        "properties": {
+          "page": { "minimum": 0, "type": "integer", "format": "int32" },
+          "size": { "minimum": 1, "type": "integer", "format": "int32" },
+          "sort": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "PageDisplayProductDto": {
+        "type": "object",
+        "properties": {
+          "total_elements": { "type": "integer", "format": "int64" },
+          "total_pages": { "type": "integer", "format": "int32" },
+          "first": { "type": "boolean" },
+          "last": { "type": "boolean" },
+          "size": { "type": "integer", "format": "int32" },
+          "content": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/DisplayProductDto" }
+          },
+          "number": { "type": "integer", "format": "int32" },
+          "sort": { "$ref": "#/components/schemas/SortObject" },
+          "number_of_elements": { "type": "integer", "format": "int32" },
+          "pageable": { "$ref": "#/components/schemas/PageableObject" },
+          "empty": { "type": "boolean" }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "offset": { "type": "integer", "format": "int64" },
+          "sort": { "$ref": "#/components/schemas/SortObject" },
+          "page_number": { "type": "integer", "format": "int32" },
+          "page_size": { "type": "integer", "format": "int32" },
+          "paged": { "type": "boolean" },
+          "unpaged": { "type": "boolean" }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "empty": { "type": "boolean" },
+          "sorted": { "type": "boolean" },
+          "unsorted": { "type": "boolean" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

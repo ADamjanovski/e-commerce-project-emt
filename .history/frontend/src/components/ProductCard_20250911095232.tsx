@@ -1,0 +1,16 @@
+import { type DisplayProductDto } from '../types/api';
+import { useCart } from '../context/CartContext';
+
+export default function ProductCard({ p }: { p: DisplayProductDto }) {
+  const { add } = useCart();
+  return (
+    <div className="card">
+      <Link key={p.id} to={`/products/${p.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+
+      <img src={p.image_url} alt={p.name} />
+      <h3>{p.name}</h3>
+      <p>{p.price.toFixed(2)} €</p>
+      <button onClick={() => add(p.id)}>Add to cart</button>
+    </div>
+  );
+}

@@ -1,0 +1,104 @@
+// src/pages/ProductListPage.tsx
+import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Link, useSearchParams } from 'react-router-dom';
+import { ProductApi, CategoryApi } from '../api/endpoints';
+import ProductCard from '../components/ProductCard';
+import type { Category, DisplayProductDto } from '../types/api';
+
+interface Page<T> {
+  content: T[];
+  totalPages: number;
+}
+
+const PAGE_SIZE = 12;
+
+export default function ProductListPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialCategory = searchParams.get('category');
+  const initialPage = Number(searchParams.get('page') || '1');
+
+  const [categoryId, setCategoryId] = useState<number | null>(
+    initialCategory ? Number(initialCategory) : null,
+  );
+  const [page, setPage] = useState<number>(initialPage);
+
+  const queryKey = useMemo(() => ['products', { categoryId, page }], [categoryId, page]);
+
+  const { data: categories = [], isLoading: catsLoading } = useQuery<Category[]>({
+    queryKey: ['categories'],
+    queryFn: () => CategoryApi.findAll().then((r) => r.data),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: pageData, isLoading: prodLoading } = useQuery<Page<DisplayProductDto>>({
+    queryKey,
+    queryFn: async () => {
+      if (categoryId === null) {
+        const r = await ProductApi.findPaginated(page - 1, PAGE_SIZE);
+        return { content: r.data.content, totalPages: r.data.totalPages };
+      }
+      const r = await ProductApi.findByCategory(categoryId, page - 1, PAGE_SIZE);
+      return { content: r.data.content, totalPages: r.data.totalPages };
+    },
+    keepPreviousData: true,
+  });
+
+  const onCategoryChange = (value: string) => {
+    const nextCategory = value ? Number(value) : null;
+    setCategoryId(nextCategory);
+    setPage(1);
+    const next = new URLSearchParams();
+    if (nextCategory) next.set('category', String(nextCategory));
+    next.set('page', '1');
+    setSearchParams(next);
+  };
+
+  const onPageChange = (nextPage: number) => {
+    setPage(nextPage);
+    const next = new URLSearchParams(searchParams);
+    next.set('page', String(nextPage));
+    setSearchParams(next);
+  };
+
+  if (catsLoading || prodLoading) return <p>Loading…</p>;
+
+  return (
+    <>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 16 }}>
+        <select value={categoryId ?? ''} onChange={(e) => onCategoryChange(e.target.value)}>
+          <option value="">All</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+        <span>{pageData?.content.length ?? 0} results</span>
+      </div>
+
+      <div className="grid">
+        {pageData?.content.map((p) => (
+          <Link key={p.id} to={`/products/${p.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <ProductCard p={p} />
+          </Link>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+        <button disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
+          Prev
+        </button>
+        <span>
+          Page {page} / {pageData?.totalPages ?? 1}
+        </span>
+        <button
+          disabled={!pageData || page >= (pageData.totalPages || 1)}
+          onClick={() => onPageChange(page + 1)}
+        >
+          Next
+        </button>
+      </div>
+    </>
+  );
+}

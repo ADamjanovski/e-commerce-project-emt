@@ -101,7 +101,7 @@ export default function ProductListPage() {
     setSearchParams(next);
   };
 
-  if (catsLoading || pageQuery.isLoading) return <p>Loading…</p>;
+  if (catsLoading) return <p>Loading categories…</p>;
 
   console.log('Page data:', pageQuery.data); // Debug log
   console.log('Current page:', page); // Debug log
@@ -137,10 +137,29 @@ export default function ProductListPage() {
         <span>Total pages: {pageQuery.data?.totalPages ?? 'unknown'}</span>
       </div>
 
-      <div className="grid">
-        {pageQuery.data?.content.map((p: DisplayProductDto) => (
-            <ProductCard p={p} />
-        ))}
+      <div style={{ position: 'relative' }}>
+        {pageQuery.isFetching && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            background: 'rgba(255, 255, 255, 0.6)',
+            zIndex: 10,
+          }}>
+            <span>Loading products…</span>
+          </div>
+        )}
+
+        <div className="grid" style={{ opacity: pageQuery.isFetching ? 0.5 : 1 }}>
+          {pageQuery.data?.content.map((p: DisplayProductDto) => (
+            <ProductCard key={p.id} p={p} />
+          ))}
+        </div>
       </div>
 
       {pageQuery.data && (

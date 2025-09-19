@@ -4,6 +4,7 @@ import com.backend.constants.JwtConstants;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +18,11 @@ import java.util.function.Function;
 @Component
 public class JwtHelper {
 
+    @Autowired
+    private JwtConstants jwtConstants;
+
     private Key getSignIn() {
-        byte[] keyBytes = Decoders.BASE64.decode(JwtConstants.SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(jwtConstants.SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -54,7 +58,7 @@ public class JwtHelper {
                 .setClaims(extraClaims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JwtConstants.EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtConstants.EXPIRATION_TIME))
                 .signWith(getSignIn(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -62,7 +66,7 @@ public class JwtHelper {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("roles", userDetails.getAuthorities());
-        return buildToken(extraClaims, userDetails.getUsername(), JwtConstants.EXPIRATION_TIME);
+        return buildToken(extraClaims, userDetails.getUsername(), jwtConstants.EXPIRATION_TIME);
     }
 
     private boolean isExpired(String token) {

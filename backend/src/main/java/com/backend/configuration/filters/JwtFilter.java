@@ -10,6 +10,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +27,9 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtHelper jwtHelper;
     private final UserService userService;
     private final HandlerExceptionResolver handlerExceptionResolver;
+    
+    @Autowired
+    private JwtConstants jwtConstants;
 
     public JwtFilter(JwtHelper jwtHelper, UserService userService, HandlerExceptionResolver handlerExceptionResolver) {
         this.jwtHelper = jwtHelper;
@@ -39,13 +43,13 @@ public class JwtFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        String headerValue = request.getHeader(JwtConstants.HEADER);
-        if (headerValue == null || !headerValue.startsWith(JwtConstants.TOKEN_PREFIX)) {
+        String headerValue = request.getHeader(jwtConstants.HEADER);
+        if (headerValue == null || !headerValue.startsWith(jwtConstants.TOKEN_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = headerValue.substring(JwtConstants.TOKEN_PREFIX.length());
+        String token = headerValue.substring(jwtConstants.TOKEN_PREFIX.length());
 
         try {
             String username = jwtHelper.extractUsername(token);

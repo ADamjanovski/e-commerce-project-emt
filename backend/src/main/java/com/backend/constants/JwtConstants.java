@@ -1,9 +1,20 @@
 package com.backend.constants;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class JwtConstants {
-    public static final String SECRET_KEY = "7ac51f34954d17b2c22a1a95ea44f1f61c72a0b87d186c8e2c607edb4db99ffd";
-    public static final Long EXPIRATION_TIME = 864000000L;
-    public static final String HEADER = "Authorization";
-    public static final String TOKEN_PREFIX = "Bearer ";
+    @Value("${jwt.secret}")
+    public String SECRET_KEY;
+    
+    @Value("${jwt.expiration}")
+    public Long EXPIRATION_TIME;
+    
+    @Value("${jwt.header}")
+    public String HEADER;
+    
+    @Value("${jwt.prefix}")
+    public String TOKEN_PREFIX;
 }
 

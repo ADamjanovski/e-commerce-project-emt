@@ -3,12 +3,22 @@ services:
     image: postgres:17.4
     restart: no
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: emt_shop
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-emt_shop}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - 2345:5432
+      - "${POSTGRES_PORT:-2345}:5432"
+  
+  redis:
+    image: redis:7-alpine
+    restart: no
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+
 volumes:
   pgdata:
+  redis_data:

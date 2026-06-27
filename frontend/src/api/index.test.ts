@@ -28,7 +28,7 @@ describe('api client', () => {
     localStorageMock.getItem.mockReturnValue('test-jwt');
 
     const { default: api } = await import('./index');
-    const interceptor = api.interceptors.request.handlers[0].fulfilled;
+    const interceptor = (api.interceptors.request as unknown as { handlers: Array<{ fulfilled?: (config: { headers: Record<string, string> }) => { headers: Record<string, string> } | Promise<{ headers: Record<string, string> }> }> }).handlers[0].fulfilled;
     const config = interceptor ? await interceptor({ headers: {} }) : { headers: {} };
 
     expect(localStorageMock.getItem).toHaveBeenCalledWith('jwt');

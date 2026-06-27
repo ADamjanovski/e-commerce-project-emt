@@ -102,27 +102,39 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import os
-          import re
 
           path = Path("kii-project-infrastructure/charts/ecommerce/values.yaml")
-          text = path.read_text()
           tag = os.environ["IMAGE_TAG"]
+          lines = path.read_text().splitlines()
 
-          text = re.sub(
-              r'(backend:\n(?:.*\n)*?repository: [^\n]+\n\s+tag: ).*',
-              rf'\1"{tag}"',
-              text,
-              count=1,
-          )
-          text = re.sub(
-              r'(frontend:\n(?:.*\n)*?repository: [^\n]+\n\s+tag: ).*',
-              rf'\1"{tag}"',
-              text,
-              count=1,
-          )
+          current_section = None
 
-          path.write_text(text)
+          for index, line in enumerate(lines):
+              stripped = line.strip()
+
+              if line.startswith("backend:"):
+                  current_section = "backend"
+                  continue
+
+              if line.startswith("frontend:"):
+                  current_section = "frontend"
+                  continue
+
+              if line and not line.startswith(" ") and stripped.endswith(":"):
+                  current_section = None
+
+              if current_section in {"backend", "frontend"} and stripped.startswith("tag:"):
+                  indent = line[: len(line) - len(line.lstrip())]
+                  lines[index] = f'{indent}tag: "{tag}"'
+                  current_section = None
+
+          path.write_text("\n".join(lines) + "\n")
           PY
+
+      - name: Show infrastructure diff
+        run: |
+          cd kii-project-infrastructure
+          git diff -- charts/ecommerce/values.yaml || true
 
       - name: Commit infrastructure changes
         run: |
@@ -133,4 +145,7 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m "chore: update ecommerce image tags to ${{ github.sha }}"
             git push
+          else
+            echo "No infrastructure change detected after updating charts/ecommerce/values.yaml"
+            exit 1
           fi

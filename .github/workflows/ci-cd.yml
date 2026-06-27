@@ -1,0 +1,136 @@
+name: CI CD
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Lint frontend
+        run: npm run lint
+        working-directory: frontend
+
+      - name: Lint backend
+        run: chmod +x mvnw && ./mvnw -q checkstyle:check
+        working-directory: backend
+
+      - name: Run backend tests
+        run: chmod +x mvnw && ./mvnw -q test
+        working-directory: backend
+
+      - name: Run frontend tests
+        run: npm test
+        working-directory: frontend
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test-and-lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/ecommerce-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/ecommerce-backend:${{ github.sha }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          build-args: |
+            VITE_API_URL=${{ vars.VITE_API_URL }}
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/ecommerce-frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/ecommerce-frontend:${{ github.sha }}
+
+  update-infrastructure:
+    runs-on: ubuntu-latest
+    needs: docker
+
+    steps:
+      - name: Checkout application repository
+        uses: actions/checkout@v4
+
+      - name: Clone infrastructure repository
+        run: git clone https://ADamjanovski:${{ secrets.INFRASTRUCTURE_REPO_TOKEN }}@github.com/ADamjanovski/kii-project-infrastructure.git
+
+      - name: Update Helm image tags
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os
+          import re
+
+          path = Path("kii-project-infrastructure/charts/ecommerce/values.yaml")
+          text = path.read_text()
+          tag = os.environ["IMAGE_TAG"]
+
+          text = re.sub(
+              r'(backend:\n(?:.*\n)*?repository: [^\n]+\n\s+tag: ).*',
+              rf'\1"{tag}"',
+              text,
+              count=1,
+          )
+          text = re.sub(
+              r'(frontend:\n(?:.*\n)*?repository: [^\n]+\n\s+tag: ).*',
+              rf'\1"{tag}"',
+              text,
+              count=1,
+          )
+
+          path.write_text(text)
+          PY
+
+      - name: Commit infrastructure changes
+        run: |
+          cd kii-project-infrastructure
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add charts/ecommerce/values.yaml
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update ecommerce image tags to ${{ github.sha }}"
+            git push
+          fi

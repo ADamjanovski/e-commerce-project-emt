@@ -12,7 +12,6 @@ import com.backend.repository.ShoppingCartRepository;
 import com.backend.service.domain.ProductService;
 import com.backend.service.domain.ShoppingCartService;
 import com.backend.service.domain.UserService;
-import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 
 @Service
 public class ShoppingCartServiceImpl implements ShoppingCartService {
@@ -34,18 +32,16 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         this.productService = productService;
     }
 
-
     @Override
     public List<Product> listAllProductsInShoppingCart(Long cartId) {
-        if (shoppingCartRepository.findById(cartId).isEmpty())
+        if (shoppingCartRepository.findById(cartId).isEmpty()) {
             throw new ShoppingCartNotFoundException(cartId);
-
+        }
 
         return shoppingCartRepository
                 .findById(cartId).get()
                 .getProducts().stream().map(ShoppingCartItem::getProduct)
                 .collect(Collectors.toList());
-
     }
 
     @Override
@@ -100,7 +96,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     @CacheEvict(value = "recommendations", key = "#username")
     public Optional<ShoppingCart> checkout(Long id, String username) {
-        if ( shoppingCartRepository.findById(id).isPresent()){
+        if (shoppingCartRepository.findById(id).isPresent()) {
             ShoppingCart shoppingCart = shoppingCartRepository.findById(id).get();
             shoppingCart.setStatus(ShoppingCartStatus.FINISHED);
             return Optional.of(shoppingCartRepository.save(shoppingCart));
@@ -122,5 +118,4 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public Optional<ShoppingCart> getShoppingCartById(Long id) {
         return shoppingCartRepository.findById(id);
     }
-
 }

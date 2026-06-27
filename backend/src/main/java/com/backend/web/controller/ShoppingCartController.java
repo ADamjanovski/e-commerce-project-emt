@@ -8,7 +8,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -86,7 +90,7 @@ public class ShoppingCartController {
     ) {
         try {
             User user = (User) authentication.getPrincipal();
-            return shoppingCartApplicationService.checkout(id,user.getUsername())
+            return shoppingCartApplicationService.checkout(id, user.getUsername())
                     .map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
         } catch (RuntimeException exception) {
@@ -95,13 +99,13 @@ public class ShoppingCartController {
     }
 
     @GetMapping("/past-carts")
-    public List<ShoppingCartDto> pastCarts(Authentication authentication){
-            User user = (User) authentication.getPrincipal();
-            return shoppingCartApplicationService.pastCarts(user.getUsername());
+    public List<ShoppingCartDto> pastCarts(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return shoppingCartApplicationService.pastCarts(user.getUsername());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ShoppingCartDto> getShoppingCartById(@PathVariable Long id){
+    public ResponseEntity<ShoppingCartDto> getShoppingCartById(@PathVariable Long id) {
         try {
             return shoppingCartApplicationService.getShoppingCartById(id)
                     .map(ResponseEntity::ok)

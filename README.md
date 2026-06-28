@@ -82,3 +82,4 @@ VITE_API_URL=http://localhost:8080
 - Frontend runs on port 5173
 - Database: PostgreSQL (port 2345)
 - Cache: Redis (port 6379)
+- 

@@ -23,6 +23,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<ShoppingCartDto | null>(null);
 
   const refresh = async () => {
+    if (!localStorage.getItem('jwt')) {
+      setCart(null);
+      return;
+    }
+
     const { data } = await CartApi.me();
     setCart(data);
   };

@@ -36,7 +36,9 @@ public class JwtSecurityWebConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOriginPatterns(List.of(
         "http://localhost:5173",
-        "http://localhost:3000"
+        "http://localhost:3000",
+        "http://ecommerce.local",
+        "https://ecommerce.local"
         ));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
@@ -56,6 +58,7 @@ public class JwtSecurityWebConfig {
                 .authorizeHttpRequests(authorizeHttpRequestsCustomizer ->
                         authorizeHttpRequestsCustomizer
                                 .requestMatchers(
+                                        "/actuator/health",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
                                         "/api/user/register",

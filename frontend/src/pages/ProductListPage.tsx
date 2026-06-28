@@ -13,8 +13,8 @@ interface Page<T> {
 
 interface SpringPageResponse<T> {
   content: T[];
-  total_pages: number;
-  total_elements: number;
+  totalPages: number;
+  totalElements: number;
   size: number;
   number: number;
   first: boolean;
@@ -71,7 +71,7 @@ export default function ProductListPage() {
         console.log('Paginated response:', data); // Debug log
         return { 
           content: data.content, 
-          totalPages: data.total_pages 
+          totalPages: data.totalPages 
         };
       }
       const r = await ProductApi.findByCategory(categoryId, page - 1, PAGE_SIZE);
@@ -79,7 +79,7 @@ export default function ProductListPage() {
       console.log('Category response:', data); // Debug log
       return { 
         content: data.content, 
-        totalPages: data.total_pages 
+        totalPages: data.totalPages 
       };
     },
   });

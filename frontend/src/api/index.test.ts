@@ -76,4 +76,19 @@ describe('api client', () => {
 
     expect(window.location.href).toBe('/register');
   });
+
+  it('uses endpoint paths without duplicating the /api prefix', async () => {
+    vi.stubEnv('VITE_API_URL', '/api');
+
+    const { default: api } = await import('./index');
+    const { AuthApi, CartApi } = await import('./endpoints');
+    const postSpy = vi.spyOn(api, 'post').mockResolvedValue({ data: { token: 'jwt.part.sig' } });
+    const getSpy = vi.spyOn(api, 'get').mockResolvedValue({ data: null });
+
+    await AuthApi.login({ username: 'user', password: 'pass' });
+    await CartApi.me();
+
+    expect(postSpy).toHaveBeenCalledWith('/user/login', { username: 'user', password: 'pass' });
+    expect(getSpy).toHaveBeenCalledWith('/shopping-cart');
+  });
 });

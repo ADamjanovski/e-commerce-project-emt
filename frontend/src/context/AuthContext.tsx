@@ -30,16 +30,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRole] = useState<AuthValue['role']>(null);
   const [username, setUsername] = useState<string | null>(null);
 
+  const clearAuth = () => {
+    localStorage.removeItem('jwt');
+    setAuth(false);
+    setRole(null);
+    setUsername(null);
+  };
+
   const inspectToken = (token: string | null) => {
-    if (!token) return;
-    const decoded: JwtPayload = jwtDecode(token);
-    if (decoded.exp * 1000 < Date.now()) {
-      localStorage.removeItem('jwt');
+    if (!token) {
+      clearAuth();
       return;
     }
-    setAuth(true);
-    setRole(decoded.role as AuthValue['role']);
-    setUsername(decoded.sub);
+
+    try {
+      const decoded: JwtPayload & { roles?: Array<{ authority?: string }> } = jwtDecode(token);
+      if (decoded.exp * 1000 < Date.now()) {
+        clearAuth();
+        return;
+      }
+
+      const role = decoded.role ?? decoded.roles?.[0]?.authority ?? null;
+      setAuth(true);
+      setRole(role as AuthValue['role']);
+      setUsername(decoded.sub);
+    } catch {
+      clearAuth();
+    }
   };
 
   useEffect(() => {
@@ -53,10 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('jwt');
-    setAuth(false);
-    setRole(null);
-    setUsername(null);
+    clearAuth();
     AuthApi.logout().catch(() => null);
   };
 

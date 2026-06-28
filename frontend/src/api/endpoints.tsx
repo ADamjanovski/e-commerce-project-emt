@@ -13,40 +13,40 @@ import {
 } from '../types/api';
 
 export const ProductApi = {
-  findAll: () => api.get<DisplayProductDto[]>('/api/products'),
+  findAll: () => api.get<DisplayProductDto[]>('/products'),
   findPaginated: (page = 0, size = 10) =>
-    api.get('/api/products/paginated', { params: { page, size } }),
+    api.get('/products/paginated', { params: { page, size } }),
   findByCategory: (id: number, page = 0, size = 10) =>
-    api.get(`/api/products/by-category/${id}`, {
+    api.get(`/products/by-category/${id}`, {
       params: { page, size },
     }),
-  findRecommended: () => api.get<DisplayProductDto[]>('/api/products/recommended'),
-  findOne: (id: number) => api.get<DisplayProductDto>(`/api/products/${id}`),
-  create: (dto: CreateProductDto) => api.post('/api/products/add', dto),
-  update: (id: number, dto: CreateProductDto) => api.put(`/api/products/edit/${id}`, dto),
-  remove: (id: number) => api.delete(`/api/products/delete/${id}`),
+  findRecommended: () => api.get<DisplayProductDto[]>('/products/recommended'),
+  findOne: (id: number) => api.get<DisplayProductDto>(`/products/${id}`),
+  create: (dto: CreateProductDto) => api.post('/products/add', dto),
+  update: (id: number, dto: CreateProductDto) => api.put(`/products/edit/${id}`, dto),
+  remove: (id: number) => api.delete(`/products/delete/${id}`),
 };
 
 export const CategoryApi = {
-  findAll: () => api.get<Category[]>('/api/categories'),
-  create: (dto: CreateCategoryDto) => api.post('/api/categories/add', dto),
+  findAll: () => api.get<Category[]>('/categories'),
+  create: (dto: CreateCategoryDto) => api.post('/categories/add', dto),
   update: (id: number, dto: CreateCategoryDto) =>
-    api.put(`/api/categories/edit/${id}`, dto),
-  remove: (id: number) => api.delete(`/api/categories/delete/${id}`),
+    api.put(`/categories/edit/${id}`, dto),
+  remove: (id: number) => api.delete(`/categories/delete/${id}`),
 };
 
 export const CartApi = {
-  me: () => api.get<ShoppingCartDto>('/api/shopping-cart'),
-  add: (id: number) => api.post<ShoppingCartDto>(`/api/shopping-cart/add-product/${id}`),
-  remove: (id: number) => api.post<ShoppingCartDto>(`/api/shopping-cart/remove-product/${id}`),
-  checkout: (cartId: number) => api.post(`/api/shopping-cart/checkout/${cartId}`),
-  past: () => api.get<ShoppingCartDto[]>(`/api/shopping-cart/past-carts`),
-  details: (id: number) => api.get<ShoppingCartDto>(`/api/shopping-cart/${id}`),
+  me: () => api.get<ShoppingCartDto>('/shopping-cart'),
+  add: (id: number) => api.post<ShoppingCartDto>(`/shopping-cart/add-product/${id}`),
+  remove: (id: number) => api.post<ShoppingCartDto>(`/shopping-cart/remove-product/${id}`),
+  checkout: (cartId: number) => api.post(`/shopping-cart/checkout/${cartId}`),
+  past: () => api.get<ShoppingCartDto[]>(`/shopping-cart/past-carts`),
+  details: (id: number) => api.get<ShoppingCartDto>(`/shopping-cart/${id}`),
 };
 
 export const AuthApi = {
-  login: (dto: LoginUserDto) => api.post<LoginResponseDto>('/api/user/login', dto),
-  register: (dto: CreateUserDto) => api.post('/api/user/register', dto),
-  logout: () => api.get('/api/user/logout'),
-  info: () => api.get<DisplayUserDto>('/api/user/info'),
+  login: (dto: LoginUserDto) => api.post<LoginResponseDto>('/user/login', dto),
+  register: (dto: CreateUserDto) => api.post('/user/register', dto),
+  logout: () => api.get('/user/logout'),
+  info: () => api.get<DisplayUserDto>('/user/info'),
 };

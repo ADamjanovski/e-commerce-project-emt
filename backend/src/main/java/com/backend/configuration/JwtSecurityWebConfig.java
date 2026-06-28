@@ -4,7 +4,7 @@ package com.backend.configuration;
 import com.backend.configuration.filters.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,6 +18,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 
 import java.util.List;
 
+@Profile("dev")
 @Configuration
 @EnableWebSecurity
 public class JwtSecurityWebConfig {
@@ -76,15 +77,6 @@ public class JwtSecurityWebConfig {
                 )
                 .sessionManagement(sessionManagementConfigurer ->
                         sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .exceptionHandling(exceptionHandlingConfigurer ->
-                        exceptionHandlingConfigurer
-                                .authenticationEntryPoint((request, response, authException) ->
-                                        response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase())
-                                )
-                                .accessDeniedHandler((request, response, accessDeniedException) ->
-                                        response.sendError(HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.getReasonPhrase())
-                                )
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
